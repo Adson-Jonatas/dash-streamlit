@@ -11,11 +11,11 @@ def main():
     layout = BaseLayout(title="DevSecOps", sidebar_title="Security by Design")
     layout.render_layout()
     modules = {
+        "Infraestrutura como Código": IACModule(),
         "Visão Geral": PrincipalModule(),
         "SAST": SASTModule(),
         "SCA": SCAModule(),
         "Containers e Imagens": ContainerModule(),
-        "Infraestrutura como Código": IACModule(),
     }
     st.sidebar.header("Painel DevSecOps")
     selected_module = st.sidebar.selectbox(
