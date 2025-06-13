@@ -1,32 +1,4 @@
-import subprocess
-
-# Mapeamento das versões para os caminhos dos binários
-JAVA_PATHS = {
-    "8": "/usr/lib/jvm/java-1.8.0-openjdk/bin/java",
-    "11": "/usr/lib/jvm/openlogic-openjdk-11-hotspot/bin/java",
-    "21": "/usr/lib/jvm/jdk-21.0.7+6/bin/java",
-}
-
-JAVAC_PATHS = {
-    "8": "/usr/lib/jvm/java-1.8.0-openjdk/bin/javac",
-    "11": "/usr/lib/jvm/openlogic-openjdk-11-hotspot/bin/javac",
-    "21": "/usr/lib/jvm/jdk-21.0.7+6/bin/javac",
-}
-
-def set_java_version(version):
-    java_bin = JAVA_PATHS.get(version)
-    javac_bin = JAVAC_PATHS.get(version)
-
-    if not java_bin or not javac_bin:
-        print(f"Versão {version} não mapeada.")
-        return
-
-    try:
-        subprocess.run(["sudo", "update-alternatives", "--set", "java", java_bin], check=True)
-        subprocess.run(["sudo", "update-alternatives", "--set", "javac", javac_bin], check=True)
-        print(f"Java {version} configurado com sucesso.")
-    except subprocess.CalledProcessError as e:
-        print(f"Erro ao configurar Java {version}: {e}")
-
-# Exemplo de uso:
-set_java_version("11")
+find /opt/apache-maven-3.0.5/lib -name '*.jar' | while read jar; do
+    echo "$jar"
+    unzip -p "$jar" META-INF/MANIFEST.MF | grep -i "build" || echo "no manifest info"
+done
