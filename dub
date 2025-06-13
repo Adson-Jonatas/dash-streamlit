@@ -2,3 +2,7 @@ find /opt/apache-maven-3.0.5/lib -name '*.jar' | while read jar; do
     echo "$jar"
     unzip -p "$jar" META-INF/MANIFEST.MF | grep -i "build" || echo "no manifest info"
 done
+
+
+
+find /opt/apache-maven-3.0.5/lib -name '*.jar' -exec javap -verbose -classpath {} org.codehaus.plexus.classworlds.launcher.Launcher \; | grep major
