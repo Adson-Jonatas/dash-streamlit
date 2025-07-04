@@ -1,0 +1,130 @@
+class Nodo:
+    def __init__(self, numero, cor):
+        self.numero = numero
+        self.cor = cor
+        self.proximo = None
+
+class ListaEspera:
+    def __init__(self):
+        self.head = None
+        self.contador_v = 1
+        self.contador_a = 201
+
+    def inserirSemPrioridade(self, nodo):
+        if not self.head:
+            self.head = nodo
+            return
+        atual = self.head
+        while atual.proximo:
+            atual = atual.proximo
+        atual.proximo = nodo
+
+    def inserirComPrioridade(self, nodo):
+        if not self.head or self.head.cor == 'V':
+            nodo.proximo = self.head
+            self.head = nodo
+            return
+
+        atual = self.head
+        while atual.proximo and atual.proximo.cor == 'A':
+            atual = atual.proximo
+        nodo.proximo = atual.proximo
+        atual.proximo = nodo
+
+    def inserir(self):
+        cor = input("Informe a cor do cartão (A ou V): ").upper()
+        if cor not in ['A', 'V']:
+            print("Cor inválida. Use apenas 'A' ou 'V'.")
+            return
+
+        if cor == 'V':
+            numero = self.contador_v
+            self.contador_v += 1
+        else:
+            numero = self.contador_a
+            self.contador_a += 1
+
+        novo = Nodo(numero, cor)
+
+        if not self.head:
+            self.head = novo
+        elif cor == 'V':
+            self.inserirSemPrioridade(novo)
+        else:
+            self.inserirComPrioridade(novo)
+
+        print(f"Paciente com cartão {cor} número {numero} inserido.")
+
+    def imprimirListaEspera(self):
+        if not self.head:
+            print("Fila vazia.")
+            return
+        atual = self.head
+        print("Lista de Espera:")
+        while atual:
+            print(f"Cartão {atual.cor} - Número {atual.numero}")
+            atual = atual.proximo
+
+    def atenderPaciente(self):
+        if not self.head:
+            print("Nenhum paciente na fila.")
+            return
+        atendido = self.head
+        self.head = self.head.proximo
+        print(f"Chamando paciente do cartão {atendido.cor} número {atendido.numero} para atendimento.")
+
+    def menu(self):
+        while True:
+            print("\n--- MENU ---")
+            print("1 – Adicionar paciente à fila")
+            print("2 – Mostrar pacientes na fila")
+            print("3 – Chamar paciente")
+            print("4 – Sair")
+
+            opcao = input("Escolha uma opção: ")
+
+            if opcao == '1':
+                self.inserir()
+            elif opcao == '2':
+                self.imprimirListaEspera()
+            elif opcao == '3':
+                self.atenderPaciente()
+            elif opcao == '4':
+                print("Encerrando o programa.")
+                break
+            else:
+                print("Opção inválida. Tente novamente.")
+
+# Para rodar:
+# fila = ListaEspera()
+# fila.menu()
+
+
+fila = ListaEspera()
+
+# H. Inserir os pacientes na ordem especificada:
+for cor in ['V', 'V', 'V', 'A', 'A', 'V', 'V', 'A', 'A', 'A']:
+    if cor == 'V':
+        numero = fila.contador_v
+        fila.contador_v += 1
+    else:
+        numero = fila.contador_a
+        fila.contador_a += 1
+    nodo = Nodo(numero, cor)
+    if cor == 'V':
+        fila.inserirSemPrioridade(nodo)
+    else:
+        fila.inserirComPrioridade(nodo)
+
+# I. Mostrar lista
+print("\n--- Lista Inicial ---")
+fila.imprimirListaEspera()
+
+# J. Atender 2 pacientes
+print("\n--- Atendendo dois pacientes ---")
+fila.atenderPaciente()
+fila.atenderPaciente()
+
+# Mostrar novamente
+print("\n--- Lista após dois atendimentos ---")
+fila.imprimirListaEspera()
