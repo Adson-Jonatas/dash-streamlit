@@ -1,78 +1,104 @@
 class Nodo:
-    def __init__(self, numero, cor):
-        self.numero = numero
-        self.cor = cor
-        self.proximo = None
+    def __init__(self, senha, cor):
+        self.senha = senha      # Senha do paciente (201, 202, 1, 2...)
+        self.cor = cor          # Cor do cartão ("A" ou "V")
+        self.proximo = None    # Referência para o próximo paciente
 
 class ListaEspera:
     def __init__(self):
         self.head = None
+        self.contador_a = 201   # Senhas de "A" começam em 201
+        self.contador_v = 1     # Senhas de "V" começam em 1
 
-    def inserirSemPrioridade(self, novo_paciente):
-        print("=== INICIANDO INSERÇÃO SEM PRIORIDADE ===")
-        print(f"Novo paciente: {novo_paciente.cor}{novo_paciente.numero}")
+    def inserir(self, cor):
+        print(f"\n=== INSERINDO PACIENTE COM COR {cor} ===")
 
-        # Se a lista estiver vazia
-        if self.head is None:
-            print("A fila está vazia. Inserindo como primeiro da fila.")
-            self.head = novo_paciente
+        # Define a senha automaticamente
+        if cor == 'A':
+            senha = self.contador_a
+            self.contador_a += 1
+        elif cor == 'V':
+            senha = self.contador_v
+            self.contador_v += 1
+        else:
+            print("Cor inválida. Use apenas 'A' ou 'V'.")
             return
 
-        # Se já existe alguém na fila
-        print("A fila não está vazia. Vamos procurar o final da fila.")
+        novo = Nodo(senha, cor)
+        print(f"Paciente criado: Cartão {cor} com senha {senha}")
 
+        if self.head is None:
+            print("Fila vazia. Inserindo como primeiro paciente.")
+            self.head = novo
+            return
+
+        if cor == 'V':
+            self.inserirSemPrioridade(novo)
+        else:
+            self.inserirComPrioridade(novo)
+
+    def inserirSemPrioridade(self, novo):
+        print(f"Inserindo paciente {novo.cor}{novo.senha} no final da fila.")
+
+        paciente_que_estou_olhando = self.head
+        passo = 0
+
+        while paciente_que_estou_olhando.proximo is not None:
+            print(f"  PASSO {passo}: Estou em {paciente_que_estou_olhando.cor}{paciente_que_estou_olhando.senha}")
+            paciente_que_estou_olhando = paciente_que_estou_olhando.proximo
+            passo += 1
+
+        paciente_que_estou_olhando.proximo = novo
+        print(f"  Ligado {paciente_que_estou_olhando.cor}{paciente_que_estou_olhando.senha} → {novo.cor}{novo.senha}")
+        print("=== INSERÇÃO COMPLETA ===")
+
+    def inserirComPrioridade(self, novo):
+        print(f"Inserindo paciente {novo.cor}{novo.senha} com prioridade (antes dos cartões verdes).")
+
+        if self.head.cor == 'V':
+            print("Primeiro paciente é verde. Inserindo no início da fila.")
+            novo.proximo = self.head
+            self.head = novo
+            return
+
+        anterior = None
         ponteiro = self.head
         passo = 0
 
-        while ponteiro.proximo is not None:
-            print(f"PASSO {passo}:")
-            print(f"  Estou olhando para o paciente {ponteiro.cor}{ponteiro.numero}")
-            print(f"  Ele aponta para {ponteiro.proximo.cor}{ponteiro.proximo.numero}")
+        while ponteiro is not None and ponteiro.cor == 'A':
+            print(f"  PASSO {passo}: Estou em {ponteiro.cor}{ponteiro.senha}")
+            anterior = ponteiro
             ponteiro = ponteiro.proximo
             passo += 1
 
-        # Quando .proximo for None, significa que achamos o último
-        print(f"PASSO {passo}:")
-        print(f"  Estou olhando para o paciente {ponteiro.cor}{ponteiro.numero}")
-        print("  Ele não aponta para ninguém (proximo == None)")
-        print("  Vamos fazer ele apontar para o novo paciente.")
+        print(f"  Parou em: {('None' if ponteiro is None else ponteiro.cor + str(ponteiro.senha))}")
+        print(f"  Último A: {anterior.cor}{anterior.senha}")
 
-        ponteiro.proximo = novo_paciente
+        novo.proximo = ponteiro
+        anterior.proximo = novo
 
-        print(f"  Agora {ponteiro.cor}{ponteiro.numero} aponta para {novo_paciente.cor}{novo_paciente.numero}")
-        print("=== INSERÇÃO FINALIZADA ===\n")
+        print(f"  Ligado {anterior.cor}{anterior.senha} → {novo.cor}{novo.senha}")
+        if ponteiro:
+            print(f"  Ligado {novo.cor}{novo.senha} → {ponteiro.cor}{ponteiro.senha}")
+        print("=== INSERÇÃO COMPLETA ===")
 
     def exibir(self):
-        print("=== FILA DE ESPERA ATUAL ===")
-        atual = self.head
-        if not atual:
+        print("\n=== FILA DE ESPERA ATUAL ===")
+        if self.head is None:
             print("Fila vazia.")
             return
 
+        atual = self.head
         while atual:
-            print(f"{atual.cor}{atual.numero} → ", end="")
+            print(f"{atual.cor}{atual.senha}", end=" → ")
             atual = atual.proximo
         print("None\n")
 
+    def atenderPaciente(self):
+        if self.head is None:
+            print("Nenhum paciente na fila.")
+            return
 
-
-# Criar a fila
-fila = ListaEspera()
-
-# Inserir A201
-p1 = Nodo(201, 'A')
-fila.inserirSemPrioridade(p1)
-fila.exibir()
-
-# Inserir A202
-p2 = Nodo(202, 'A')
-fila.inserirSemPrioridade(p2)
-fila.exibir()
-
-# Inserir V1
-p3 = Nodo(1, 'V')
-fila.inserirSemPrioridade(p3)
-fila.exibir()
-
-
-
+        chamado = self.head
+        self.head = self.head.proximo
+        print(f"\nPaciente chamado: Cartão {chamado.cor} com senha {chamado.senha}")
